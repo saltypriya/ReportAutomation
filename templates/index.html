@@ -8,6 +8,7 @@
 <body class="bg-light">
   <div class="container mt-5">
     <h2 class="mb-4">Upload Excel to Generate Report</h2>
+
     <form method="POST" enctype="multipart/form-data" class="mb-4">
       <div class="mb-3">
         <label for="excel" class="form-label">Select Excel File (.xlsx)</label>
@@ -16,14 +17,12 @@
       <button type="submit" class="btn btn-primary">Generate Report</button>
     </form>
 
-    {% if files %}
+    {% if show_results and files %}
       <div class="alert alert-success">
         <h5>✅ Reports generated:</h5>
         <ul>
           {% for file in files %}
-            <li>
-              <a href="{{ url_for('download_file', filename=file) }}" class="btn btn-link">{{ file }}</a>
-            </li>
+            <li><a href="{{ url_for('download_file', filename=file) }}" class="btn btn-link">{{ file }}</a></li>
           {% endfor %}
         </ul>
         <a href="{{ url_for('download_zip') }}" class="btn btn-outline-primary mt-3">Download All as ZIP</a>

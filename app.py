@@ -6,7 +6,6 @@ from report_generator import generate_perfect_reports
 
 app = Flask(__name__)
 
-# Define folders
 UPLOAD_FOLDER = 'uploads'
 REPORT_FOLDER = 'reports'
 PHOTOS_FOLDER = 'photos'
@@ -15,36 +14,37 @@ PHOTOS_FOLDER = 'photos'
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 os.makedirs(REPORT_FOLDER, exist_ok=True)
 
-# 🧹 Clear old reports on server restart
+# Clear old reports on startup
 for f in os.listdir(REPORT_FOLDER):
     os.remove(os.path.join(REPORT_FOLDER, f))
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
     generated_files = []
+    show_results = False  # Only show files if Excel was uploaded
 
     if request.method == 'POST':
         file = request.files.get('excel')
         if file and file.filename.endswith('.xlsx'):
-            # Save uploaded Excel
+            # Save Excel file
             excel_path = os.path.join(UPLOAD_FOLDER, 'claim_data.xlsx')
             file.save(excel_path)
 
-            # Clear previously generated reports
+            # Clear old reports
             for f in os.listdir(REPORT_FOLDER):
                 os.remove(os.path.join(REPORT_FOLDER, f))
 
-            # Generate reports
+            # Generate new reports
             generate_perfect_reports(
                 excel_path=excel_path,
                 output_folder=REPORT_FOLDER,
                 photos_path=PHOTOS_FOLDER
             )
 
-            # List all generated reports
             generated_files = os.listdir(REPORT_FOLDER)
+            show_results = True
 
-    return render_template('index.html', files=generated_files)
+    return render_template('index.html', files=generated_files, show_results=show_results)
 
 @app.route('/download/<filename>')
 def download_file(filename):
